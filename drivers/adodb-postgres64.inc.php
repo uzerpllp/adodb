@@ -208,9 +208,13 @@ a different OID if a database must be reloaded. */
 	{
 		$info = $this->ServerInfo();
 		if ($info['version'] >= 7.3) {
-		$this->metaTablesSQL = "select table_name,'T' from information_schema.tables where table_schema not in ( 'pg_catalog','information_schema')
+		$this->metaTablesSQL = "select table_name,'T' from information_schema.tables where table_schema = 'public'
 			union
-		       select table_name,'V' from information_schema.views where table_schema not in ( 'pg_catalog','information_schema') ";
+		       select table_name,'V' from information_schema.views where table_schema = 'public' 
+		    union
+              select schemaname||'.'||tablename,'T' from pg_tables where schemaname  not in ( 'public','pg_catalog','information_schema')
+ 	        union 
+              select schemaname||'.'||viewname,'V' from pg_views where schemaname  not in ( 'public','pg_catalog','information_schema')";
 		}
 		if ($mask) {
 			$save = $this->metaTablesSQL;
@@ -483,7 +487,7 @@ select viewname,'V' from pg_views where viewname like $mask";
 		$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
 		if ($this->fetchMode !== false) $savem = $this->SetFetchMode(false);
 		
-		if ($schema) $rs = $this->Execute(sprintf($this->metaColumnsSQL1,$table,$table,$schema));
+		if ($schema) $rs = $this->Execute(sprintf($this->metaColumnsSQL1,$table,$table,$table,$schema));
 		else $rs = $this->Execute(sprintf($this->metaColumnsSQL,$table,$table,$table));
 		if (isset($savem)) $this->SetFetchMode($savem);
 		$ADODB_FETCH_MODE = $save;
