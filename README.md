@@ -1,3 +1,5 @@
+**This fork is no-longer maintained and no-longer used by uzERP as of release 1.17**
+
 ADODB Library for PHP5
 ======================
 
